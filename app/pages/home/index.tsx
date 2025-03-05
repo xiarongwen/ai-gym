@@ -1,6 +1,9 @@
 import React, { useState } from 'react'
 // import { useColorScheme } from 'react-native'
 import { Box } from 'native-base'
+import {
+  Overlay,
+} from '@fruits-chain/react-native-xiaoshu'
 import { BottomTabs } from '../../components/bottom-tabs'
 import { TrainingPage } from '../training'
 import { ExercisesPage } from '../exercises'
@@ -11,6 +14,7 @@ import { checkLoginStatus } from '../../services/user'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { FanMenu } from '../../components/fan-menu'
+import { StatsCard } from '../../components/stats-card'
 
 type RootStackParamList = {
   Login: undefined;
@@ -62,40 +66,54 @@ export function HomePage(): React.JSX.Element {
 
   const fanMenuItems = [
     {
-      label: '跑步',
+      label: '新建有氧',
       onPress: () => console.log('Running'),
-      color: '#FF4B4B'
+      color: '#FF4B4B',
+      icon: 'walk'
     },
     {
-      label: '骑行',
+      label: '新建骑行',
       onPress: () => console.log('Cycling'),
-      color: '#4CAF50'
+      color: '#4CAF50',
+      icon: 'bicycle'
     },
     {
-      label: '游泳',
-      onPress: () => console.log('Swimming'),
-      color: '#2196F3'
-    },
-    {
-      label: '力量',
+      label: '新建训练',
       onPress: () => console.log('Strength'),
-      color: '#9C27B0'
+      color: '#9C27B0',
+      icon: 'barbell'
     },
     {
-      label: '瑜伽',
+      label: '新建游泳',
+      onPress: () => console.log('Swimming'),
+      color: '#2196F3',
+      icon: 'water'
+    },
+    {
+      label: '休息日',
       onPress: () => console.log('Yoga'),
-      color: '#FF9800'
+      color: '#FF9800',
+      icon: 'bed'
     }
   ]
 
   return (
     <Box flex={1} safeArea>
       {renderContent()}
-      <FanMenu 
-        isOpen={isFanMenuOpen}
-        onClose={() => setIsFanMenuOpen(false)}
-        items={fanMenuItems}
-      />
+      <Overlay visible={isFanMenuOpen} onPress={() => setIsFanMenuOpen(false)}>
+        <Box position="absolute" top={0} left={0} right={0} bottom={0} justifyContent="center" alignItems="center">
+          <StatsCard 
+            totalWorkouts={1}
+            totalMinutes={36}
+            totalCalories={280}
+          />
+        </Box>
+        <FanMenu 
+            isOpen={isFanMenuOpen}
+            onClose={() => setIsFanMenuOpen(false)}
+            items={fanMenuItems}
+          />
+      </Overlay>
       <BottomTabs 
         activeTab={activeTab}
         onChangeTab={handleTabChange}
