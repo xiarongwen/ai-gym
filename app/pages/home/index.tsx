@@ -10,6 +10,7 @@ import { ProfilePage } from '../profile'
 import { checkLoginStatus } from '../../services/user'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { FanMenu } from '../../components/fan-menu'
 
 type RootStackParamList = {
   Login: undefined;
@@ -23,14 +24,21 @@ export function HomePage(): React.JSX.Element {
 //   const isDarkMode = useColorScheme() === 'dark'
   const navigation = useNavigation<NavigationProp>()
   const [activeTab, setActiveTab] = useState('training')
+  const [isFanMenuOpen, setIsFanMenuOpen] = useState(false)
 
   const handleTabChange = async (tab: string) => {
+    if (tab === 'training') {
+    }
     if (tab === 'profile') {
       const isLoggedIn = await checkLoginStatus()
       if (!isLoggedIn) {
         navigation.navigate('Login')
         return
       }
+    }
+    if (tab === 'start') {
+      setIsFanMenuOpen(!isFanMenuOpen)
+      return
     }
     setActiveTab(tab)
   }
@@ -52,9 +60,42 @@ export function HomePage(): React.JSX.Element {
     }
   }
 
+  const fanMenuItems = [
+    {
+      label: '跑步',
+      onPress: () => console.log('Running'),
+      color: '#FF4B4B'
+    },
+    {
+      label: '骑行',
+      onPress: () => console.log('Cycling'),
+      color: '#4CAF50'
+    },
+    {
+      label: '游泳',
+      onPress: () => console.log('Swimming'),
+      color: '#2196F3'
+    },
+    {
+      label: '力量',
+      onPress: () => console.log('Strength'),
+      color: '#9C27B0'
+    },
+    {
+      label: '瑜伽',
+      onPress: () => console.log('Yoga'),
+      color: '#FF9800'
+    }
+  ]
+
   return (
     <Box flex={1} safeArea>
       {renderContent()}
+      <FanMenu 
+        isOpen={isFanMenuOpen}
+        onClose={() => setIsFanMenuOpen(false)}
+        items={fanMenuItems}
+      />
       <BottomTabs 
         activeTab={activeTab}
         onChangeTab={handleTabChange}

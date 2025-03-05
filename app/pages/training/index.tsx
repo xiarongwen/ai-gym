@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Text, useColorMode, VStack, HStack, Pressable, ScrollView, Image } from 'native-base';
 import { respDims } from '../../utils/dimensions';
-
 interface TrainingPlanProps {
   title: string;
   subtitle: string;
@@ -119,7 +118,6 @@ export function TrainingPage(): React.JSX.Element {
             >
               即将到来
             </Text>
-
             <TrainingPlanCard
               title="胸·三头·腹肌"
               subtitle="减脂·6组"
@@ -156,7 +154,7 @@ export function TrainingPage(): React.JSX.Element {
                       bg={selectedTab === item.value ? 'blue.500' : 'coolGray.200'}
                       borderRadius={respDims(16)}
                   >
-                    <Text color="white">{item.title}</Text>
+                    <Text color="black">{item.title}</Text>
                   </Box>
                 </Pressable>
               ))}
