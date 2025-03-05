@@ -2,6 +2,9 @@ import React, { useEffect } from 'react'
 import { TouchableOpacity, Animated, StyleSheet, Text } from 'react-native'
 import { Box } from 'native-base'
 import { respDims } from '../../utils/dimensions'
+import {
+  Overlay,
+} from '@fruits-chain/react-native-xiaoshu'
 
 interface FanMenuItem {
   label: string
@@ -43,9 +46,11 @@ export function FanMenu({ isOpen, onClose, items }: FanMenuProps) {
   }, [isOpen, animations])
 
   return (
-    <Box position="absolute" bottom={respDims(70)} left={0} right={0} alignItems="center">
-      {items.map((item, index) => {
-        const rotateZ = animations[index].interpolate({
+    <>
+      <Overlay visible={isOpen} onPress={onClose}>
+        <Box position="absolute" bottom={respDims(70)} left={0} right={0} alignItems="center">
+          {items.map((item, index) => {
+          const rotateZ = animations[index].interpolate({
           inputRange: [0, 1],
           outputRange: ['90deg', '0deg']
         })
@@ -77,8 +82,10 @@ export function FanMenu({ isOpen, onClose, items }: FanMenuProps) {
             </TouchableOpacity>
           </Animated.View>
         )
-      })}
-    </Box>
+        })}
+      </Box>
+    </Overlay>
+    </>
   )
 }
 
