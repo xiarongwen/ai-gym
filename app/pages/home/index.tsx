@@ -20,6 +20,7 @@ type RootStackParamList = {
   Login: undefined;
   Profile: undefined;
   Home: undefined;
+  SelectTrainingPlan: undefined;
 }
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>
@@ -79,7 +80,10 @@ export function HomePage(): React.JSX.Element {
     },
     {
       label: '新建训练',
-      onPress: () => console.log('Strength'),
+      onPress: () => {
+        setIsFanMenuOpen(false)
+        navigation.navigate('SelectTrainingPlan')
+      },
       color: '#9C27B0',
       icon: 'barbell'
     },

@@ -17,10 +17,7 @@ export function StatsCard({ totalWorkouts, totalMinutes, totalCalories }: StatsC
       title="本月训练"
       style={{
         width: '90%',
-        marginHorizontal: respDims(16),
-        marginBottom: respDims(16),
-        backgroundColor: 'rgba(255, 255, 255, 0.92)',
-      }}
+        alignSelf: 'center',}}
     >
       <HStack justifyContent="space-between" alignItems="center">
         <VStack alignItems="flex-start" space={respDims(5)}>
