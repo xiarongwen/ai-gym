@@ -39,6 +39,7 @@
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>arm64</string>
+		<string>healthkit</string>
 	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
@@ -67,5 +68,9 @@
 		<string>Zocial.ttf</string>
 		<string>Fontisto.ttf</string>
 	</array>
+	<key>NSHealthShareUsageDescription</key>
+	<string>我们需要访问您的健康数据以提供更准确的训练建议</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>我们需要访问您的健康数据以提供更准确的训练建议</string>
 </dict>
 </plist>

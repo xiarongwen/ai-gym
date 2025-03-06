@@ -1,182 +1,218 @@
-import React, { useState } from 'react';
-import { Box, Text, useColorMode, VStack, HStack, Pressable, ScrollView, Image } from 'native-base';
+import React, { useEffect, useState } from 'react';
+import { Linking, StatusBar } from 'react-native';  // 从 react-native 导入 Linking 和 StatusBar
+import { Box, Text, VStack, HStack, Pressable, Image, Icon, ScrollView } from 'native-base';
 import { respDims } from '../../utils/dimensions';
-interface TrainingPlanProps {
+import { ChevronRightIcon } from 'native-base'; // 假设使用 native-base 的图标
+import { getHealthData } from '../../services/health';
+
+interface ExerciseItemProps {
   title: string;
-  subtitle: string;
-  isPro?: boolean;
+  reps: string;
+  sets: number;
 }
 
-const tabBar = [
-  {
-    title: '减脂塑形',
-    value: 'fat-loss',
-  },
-  {
-    title: '部位专攻',
-    value: 'targeted-training',
-  },
-  {
-    title: '增肌·男',
-    value: 'muscle-gain-male',
-  },
-  {
-    title: '增肌·女',
-    value: 'muscle-gain-female',
-  },
-]
-
-const TrainingPlanCard = ({ title, subtitle, isPro }: TrainingPlanProps) => {
-  const { colorMode } = useColorMode();
-  
+const ExerciseItem = ({ title, reps, sets }: ExerciseItemProps) => {
   return (
     <Pressable>
-      <Box 
-        bg={colorMode === 'dark' ? 'coolGray.800' : 'white'} 
-        p={respDims(12)}
-        mb={respDims(8)}
+      <HStack 
+        bg="white" 
+        p={respDims(16)} 
         borderRadius={respDims(8)}
+        mb={respDims(12)}
+        alignItems="center"
+        justifyContent="space-between"
+        shadow={2}
       >
-        <HStack justifyContent="space-between" alignItems="center">
+        <HStack space={respDims(12)} alignItems="center">
+          <Box 
+            bg="coolGray.200"
+            w={respDims(40)} 
+            h={respDims(40)} 
+            borderRadius={respDims(8)}
+          />
           <VStack>
-            <Text
-              fontSize={respDims(16)}
-              color={colorMode === 'dark' ? 'warmGray.50' : 'coolGray.800'}
-            >
+            <Text fontSize={respDims(16)} color="coolGray.800">
               {title}
             </Text>
-            <Text
-              fontSize={respDims(14)}
-              color={colorMode === 'dark' ? 'warmGray.400' : 'coolGray.600'}
-            >
-              {subtitle}
+            <Text fontSize={respDims(14)} color="coolGray.500">
+              {reps} × {sets}组
             </Text>
           </VStack>
-          {isPro && (
-            <Box
-              bg="coolGray.700"
-              px={respDims(6)}
-              py={respDims(2)}
-              borderRadius={respDims(4)}
-            >
-              <Text color="white" fontSize={respDims(12)}>Pro</Text>
-            </Box>
-          )}
         </HStack>
-      </Box>
-    </Pressable>
-  );
-};
-
-interface PlanTemplateProps {
-  title: string;
-  imageUrl: string;
-}
-
-const PlanTemplate = ({ title, imageUrl }: PlanTemplateProps) => {
-  return (
-    <Pressable>
-      <Box
-        borderRadius={respDims(8)}
-        overflow="hidden"
-        mb={respDims(12)}
-      >
-        <Image
-          source={{ uri: imageUrl }}
-          alt={title}
-          width="100%"
-          height={respDims(120)}
-        />
-        <Text
-          position="absolute"
-          bottom={respDims(8)}
-          left={respDims(8)}
-          color="white"
-          fontSize={respDims(16)}
-          fontWeight="bold"
-        >
-          {title}
-        </Text>
-      </Box>
+        <Icon as={ChevronRightIcon} size={respDims(20)} color="coolGray.400" />
+      </HStack>
     </Pressable>
   );
 };
 
 export function TrainingPage(): React.JSX.Element {
-  const { colorMode } = useColorMode();
-  const [selectedTab, setSelectedTab] = useState<string>(tabBar[0].value);
-  return (
-    <Box flex={1} bg={colorMode === 'dark' ? 'coolGray.900' : 'coolGray.100'}>
-      <Box p={respDims(16)} flex={1}>
-        <VStack flex={1} space={respDims(24)}>
-          <Box>
-            <Text
-              fontSize={respDims(20)}
-              fontWeight="bold"
-              color={colorMode === 'dark' ? 'warmGray.50' : 'coolGray.800'}
-              mb={respDims(16)}
-            >
-              即将到来
-            </Text>
-            <TrainingPlanCard
-              title="胸·三头·腹肌"
-              subtitle="减脂·6组"
-            />
-            <TrainingPlanCard
-              title="休息日"
-              subtitle="练 1休 1"
-            />
-          </Box>
+  const [healthData, setHealthData] = useState<{ isAuthorized: boolean, steps?: number, heartRate?: number, calories?: number }>({ isAuthorized: false });
 
-          <Box flex={1}>
-            <HStack justifyContent="space-between" alignItems="center" mb={respDims(12)}>
-              <Text
-                fontSize={respDims(20)}
-                fontWeight="bold"
-                color={colorMode === 'dark' ? 'warmGray.50' : 'coolGray.800'}
-              >
-                官方计划
-              </Text>
-              <Text
-                fontSize={respDims(14)}
-                color="coolGray.500"
-              >
-                个人模板
-              </Text>
-            </HStack>
-            <Box>
-              <HStack space={respDims(12)} overflow="scroll" mb={respDims(12)}>
-                {tabBar.map((item) => (
-                  <Pressable key={item.value} onPress={() => setSelectedTab(item.value)}>
-                    <Box
-                      px={respDims(12)}
-                      py={respDims(6)}
-                      bg={selectedTab === item.value ? 'blue.500' : 'coolGray.200'}
-                      borderRadius={respDims(16)}
-                  >
-                    <Text color="black">{item.title}</Text>
-                  </Box>
-                </Pressable>
-              ))}
+  useEffect(() => {
+    async function fetchHealthData() {
+      const data = await getHealthData();
+      setHealthData(data);
+    }
+    fetchHealthData();
+  }, []);
+
+  const handleHealthKitPress = () => {
+    Linking.openURL('app-settings:');
+  };
+
+  return (
+    <>
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle="light-content"
+      />
+      <Box flex={1} bg="#8B5CF6">
+        {/* 固定的顶部区域 */}
+        <VStack 
+          pt={StatusBar.currentHeight} 
+          p={respDims(16)} 
+          space={respDims(12)}
+        >
+          <HStack justifyContent="space-between" alignItems="center">
+            <Text fontSize={respDims(24)} color="white" fontWeight="bold">
+              跟着感觉走
+            </Text>
+            <Box 
+              w={respDims(40)} 
+              h={respDims(40)} 
+              bg="rgba(255, 255, 255, 0.2)"
+              borderRadius={respDims(20)}
+            />
+          </HStack>
+          
+          <Text color="white" fontSize={respDims(14)}>
+            今天是否要锻炼还是休息？可以根据自己的健身目标和心情决定。
+          </Text>
+
+          {/* 健康数据提示 */}
+          <Pressable onPress={handleHealthKitPress}>
+            <Box 
+              bg="rgba(255, 255, 255, 0.1)" 
+              p={respDims(12)}
+              borderRadius={respDims(8)}
+            >
+              <HStack alignItems="center" space={respDims(8)}>
+                <Box 
+                  bg="rgba(255, 255, 255, 0.2)"
+                  w={respDims(24)} 
+                  h={respDims(24)} 
+                  borderRadius={respDims(12)}
+                />
+                <Text color="white" flex={1}>
+                  {!healthData.isAuthorized 
+                    ? "未获取到健康数据，请在带 Apple Watch 开打 Health 数据授权，以便于能够根据你的健康数据更更准确地给你建议。"
+                    : `今日数据：步数 ${healthData.steps}，心率 ${healthData.heartRate}，消耗 ${healthData.calories} 卡路里`
+                  }
+                </Text>
+                <Icon 
+                  as={ChevronRightIcon} 
+                  size={respDims(20)} 
+                  color="white" 
+                />
               </HStack>
             </Box>
-            <ScrollView flex={1} showsVerticalScrollIndicator={false}>
-              <PlanTemplate
-                title="男生减脂塑形提径"
-                imageUrl="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=3540&auto=format&fit=crop"
-              />
-               <PlanTemplate
-                title="男生减脂塑形提径"
-                imageUrl="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=3540&auto=format&fit=crop"
-              />
-               <PlanTemplate
-                title="男生减脂塑形提径"
-                imageUrl="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=3540&auto=format&fit=crop"
-              />
-            </ScrollView>
-          </Box>
+          </Pressable>
         </VStack>
+
+        {/* 可滚动的内容区域 */}
+        <ScrollView 
+          flex={1} 
+          showsVerticalScrollIndicator={false}
+        >
+          <VStack 
+            p={respDims(16)} 
+            space={respDims(16)}
+            pb={respDims(80)}
+          >
+            {/* 区块2: 训练计划区域 */}
+            <VStack space={respDims(12)} bg="white" p={respDims(16)} borderRadius={respDims(12)} shadow={2}>
+              <HStack justifyContent="space-between" alignItems="center">
+                <Text>今日训练：</Text>
+                <HStack space={respDims(4)} alignItems="center">
+                  <Text>背 + 二头</Text>
+                  <Box bg="purple.100" px={respDims(4)} py={respDims(1)} borderRadius={respDims(4)}>
+                    <Text color="purple.600" fontSize={respDims(12)}>AI 推荐</Text>
+                  </Box>
+                </HStack>
+                <Pressable>
+                  <HStack space={respDims(4)} alignItems="center">
+                    <Text color="purple.600">下一个训练</Text>
+                    <Icon as={ChevronRightIcon} size={respDims(16)} color="purple.600" />
+                  </HStack>
+                </Pressable>
+              </HStack>
+
+              <HStack space={respDims(12)}>
+                <Box flex={1} bg="purple.50" p={respDims(8)} borderRadius={respDims(8)}>
+                  <Text color="purple.900">训练类型</Text>
+                  <Text color="purple.700" fontSize={respDims(14)}>四分化训练</Text>
+                </Box>
+                <Box flex={1} bg="purple.50" p={respDims(8)} borderRadius={respDims(8)}>
+                  <Text color="purple.900">目标肌群</Text>
+                  <Text color="purple.700" fontSize={respDims(14)}>背、二头</Text>
+                </Box>
+                <Box flex={1} bg="purple.50" p={respDims(8)} borderRadius={respDims(8)}>
+                  <Text color="purple.900">预估时长</Text>
+                  <Text color="purple.700" fontSize={respDims(14)}>1小时</Text>
+                </Box>
+              </HStack>
+
+              <Pressable>
+                <Box 
+                  bg="purple.600" 
+                  py={respDims(12)}
+                  borderRadius={respDims(8)}
+                  alignItems="center"
+                >
+                  <Text color="white" fontSize={respDims(16)} fontWeight="bold">
+                    开始训练
+                  </Text>
+                </Box>
+              </Pressable>
+            </VStack>
+
+            {/* 区块3: 训练动作列表 */}
+            <VStack space={respDims(12)} bg="white" p={respDims(16)} borderRadius={respDims(12)} shadow={2}>
+              <HStack justifyContent="space-between" alignItems="center">
+                <Text fontSize={respDims(16)} fontWeight="bold">
+                  6 个训练动作
+                </Text>
+                <HStack space={respDims(8)}>
+                  <Pressable>
+                    <Box bg="purple.50" px={respDims(12)} py={respDims(4)} borderRadius={respDims(16)}>
+                      <Text color="purple.600">添加动作</Text>
+                    </Box>
+                  </Pressable>
+                  <Pressable>
+                    <Box bg="purple.50" px={respDims(12)} py={respDims(4)} borderRadius={respDims(16)}>
+                      <Text color="purple.600">指导</Text>
+                    </Box>
+                  </Pressable>
+                </HStack>
+              </HStack>
+
+              <VStack space={respDims(8)}>
+                <ExerciseItem 
+                  title="引体向上"
+                  reps="8次"
+                  sets={4}
+                />
+                <ExerciseItem 
+                  title="俯卧杠铃划船"
+                  reps="30 下 × 8"
+                  sets={4}
+                />
+              </VStack>
+            </VStack>
+          </VStack>
+        </ScrollView>
       </Box>
-    </Box>
+    </>
   );
 }
