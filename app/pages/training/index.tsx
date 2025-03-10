@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Linking, StatusBar } from 'react-native';  // 从 react-native 导入 Linking 和 StatusBar
-import { Box, Text, VStack, HStack, Pressable, Image, Icon, ScrollView } from 'native-base';
+import { Box, Text, VStack, HStack, Pressable, Image, ScrollView } from 'native-base';
 import { respDims } from '../../utils/dimensions';
 import { ChevronRightIcon } from 'native-base'; // 假设使用 native-base 的图标
 import { getHealthData } from '../../services/health';
+import Icon from 'react-native-vector-icons/Ionicons'
+import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '../../hooks/useAuth'; // 假设有这个 hook 来获取登录状态
 
 interface ExerciseItemProps {
   title: string;
@@ -39,18 +42,21 @@ const ExerciseItem = ({ title, reps, sets }: ExerciseItemProps) => {
             </Text>
           </VStack>
         </HStack>
-        <Icon as={ChevronRightIcon} size={respDims(20)} color="coolGray.400" />
+        <Icon name="person-circle-outline" size={respDims(20)} color="coolGray.400"  />
       </HStack>
     </Pressable>
   );
 };
 
 export function TrainingPage(): React.JSX.Element {
+  const navigation = useNavigation();
+  const { isAuthenticated } = useAuth();
   const [healthData, setHealthData] = useState<{ isAuthorized: boolean, steps?: number, heartRate?: number, calories?: number }>({ isAuthorized: false });
 
   useEffect(() => {
     async function fetchHealthData() {
       const data = await getHealthData();
+      console.log('data', data);
       setHealthData(data);
     }
     fetchHealthData();
@@ -58,6 +64,14 @@ export function TrainingPage(): React.JSX.Element {
 
   const handleHealthKitPress = () => {
     Linking.openURL('app-settings:');
+  };
+
+  const handleProfilePress = () => {
+    if (isAuthenticated) {
+      navigation.navigate('Profile' as never);
+    } else {
+      navigation.navigate('Login' as never); 
+    }
   };
 
   return (
@@ -78,12 +92,22 @@ export function TrainingPage(): React.JSX.Element {
             <Text fontSize={respDims(24)} color="white" fontWeight="bold">
               跟着感觉走
             </Text>
-            <Box 
-              w={respDims(40)} 
-              h={respDims(40)} 
-              bg="rgba(255, 255, 255, 0.2)"
-              borderRadius={respDims(20)}
-            />
+            <Pressable onPress={handleProfilePress}>
+              <Box 
+                w={respDims(40)} 
+                h={respDims(40)} 
+                bg="rgba(255, 255, 255, 0.2)"
+                borderRadius={respDims(20)}
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Icon 
+                  name="person-circle-outline" 
+                  size={respDims(24)} 
+                  color="white" 
+                />
+              </Box>
+            </Pressable>
           </HStack>
           
           <Text color="white" fontSize={respDims(14)}>
@@ -110,11 +134,7 @@ export function TrainingPage(): React.JSX.Element {
                     : `今日数据：步数 ${healthData.steps}，心率 ${healthData.heartRate}，消耗 ${healthData.calories} 卡路里`
                   }
                 </Text>
-                <Icon 
-                  as={ChevronRightIcon} 
-                  size={respDims(20)} 
-                  color="white" 
-                />
+                <Icon name="chevron-forward-outline" size={respDims(20)} color="white" />
               </HStack>
             </Box>
           </Pressable>
@@ -143,7 +163,7 @@ export function TrainingPage(): React.JSX.Element {
                 <Pressable>
                   <HStack space={respDims(4)} alignItems="center">
                     <Text color="purple.600">下一个训练</Text>
-                    <Icon as={ChevronRightIcon} size={respDims(16)} color="purple.600" />
+                    <Icon name="chevron-forward-outline" size={respDims(16)} color="purple.600" />
                   </HStack>
                 </Pressable>
               </HStack>

@@ -15,6 +15,7 @@
     "@nutui/nutui-react-native": "^0.0.8",
     "@react-native-async-storage/async-storage": "^2.1.2",
     "@react-native-community/blur": "^4.4.1",
+    "@react-native-picker/picker": "^2.11.0",
     "@react-navigation/native": "^7.0.15",
     "@react-navigation/native-stack": "^7.2.1",
     "@types/react-navigation": "^3.0.8",
@@ -28,7 +29,8 @@
     "react-native-safe-area-context": "^5.3.0",
     "react-native-screens": "^4.9.1",
     "react-native-svg": "^15.11.2",
-    "react-native-vector-icons": "^10.2.0"
+    "react-native-vector-icons": "^10.2.0",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
